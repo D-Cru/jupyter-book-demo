@@ -25,7 +25,12 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-
+    
+    # activate nglview
+    - name: Activate NglView
+      run: |
+        jupyter-nbextension enable nglview --py --sys-prefix
+    
     # Build the book
     - name: Build the book
       run: |
