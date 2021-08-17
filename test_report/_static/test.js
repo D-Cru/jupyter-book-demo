@@ -4,7 +4,7 @@ NGL.DatasourceRegistry.add(
 );
 
 // Create NGL Stage object
-var stage = new NGL.Stage( "viewport" );
+var stage = new NGL.Stage( "viewporter" );
 
 // Handle window resizing
 window.addEventListener( "resize", function( event ){
