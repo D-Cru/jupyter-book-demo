@@ -15,7 +15,8 @@ logo                        : logo.png  # A path to the book logo
 execute:
   execute_notebooks: auto
   exclude_patterns:
-    - 'processed'
+    - '*_processed.ipynb'
+    - '*_compar.ipynb'
 
 # Define the name of the latex output file for PDF builds
 latex:
