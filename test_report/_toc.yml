@@ -1,10 +1,16 @@
 # Table of contents
 # Learn more at https://jupyterbook.org/customize/toc.html
 
-format: jb-article
-root: intro
-sections:
-- file: content
+format: jb-book
+root: index
+options:
+  numbered: True
+chapters:
+- file: visualisations
+  sections:
+  - file: 22/equilibration
+  - file: 22/3d110be4b2d63f96_GaMD_processed
+- file: introduction
   sections:
   - file: markdown
   - file: notebooks
