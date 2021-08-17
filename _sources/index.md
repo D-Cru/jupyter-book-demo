@@ -1,7 +1,8 @@
 # Welcome to your Jupyter Book
 
 This is a small sample book to give you a feel for how book content is
-structured.
+structured and how molecule representations could work in an interactive
+article style.
 
 :::{note}
 Here is a note!
