@@ -48,9 +48,9 @@
     <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
-        const thebe_selector = ".thebe"
-        const thebe_selector_input = "pre"
-        const thebe_selector_output = ".output"
+        const thebe_selector = ".thebe,.cell"
+        const thebe_selector_input = "pre,.cell_input div.highlight"
+        const thebe_selector_output = ".output,.cell_output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -138,6 +138,11 @@
    </li>
   </ul>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../there_test.html">
+   3. TEST
+  </a>
+ </li>
 </ul>
 
     </div>
@@ -195,11 +200,11 @@
         aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
-            href="https://github.com/d-cru/Test Report"><button type="button" class="btn btn-secondary topbarbtn"
+            href="https://github.com/d-cru/test_report"><button type="button" class="btn btn-secondary topbarbtn"
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/d-cru/Test Report/issues/new?title=Issue%20on%20page%20%2F22/3d110be4b2d63f96_GaMD_processed.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/d-cru/test_report/issues/new?title=Issue%20on%20page%20%2F22/3d110be4b2d63f96_GaMD_processed.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -220,7 +225,7 @@
         aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
     <div class="dropdown-buttons">
         
-        <a class="binder-button" href="https://mybinder.org/v2/gh/d-cru/Test Report/main?urlpath=tree/docs/22/3d110be4b2d63f96_GaMD_processed.ipynb"><button type="button"
+        <a class="binder-button" href="https://mybinder.org/v2/gh/d-cru/test_report/main?urlpath=tree/docs/22/3d110be4b2d63f96_GaMD_processed.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
                 data-placement="left"><img class="binder-button-logo"
                     src="../_static/images/logo_binder.svg"
@@ -228,6 +233,9 @@
         
         
         
+        <button type="button" class="btn btn-secondary topbarbtn"
+            onclick="initThebeSBT()" title="Launch Thebe" data-toggle="tooltip" data-placement="left"><i
+                class="fas fa-play"></i><span style="margin-left: .4em;">Live Code</span></button>
         
     </div>
 </div>
@@ -2984,8 +2992,8 @@ PyMOL&gt;cmd.mpng(&quot;data/processed/refactor-test/results/22/H2O/GaMD/1000/0/
     {
         requestKernel: true,
         binderOptions: {
-            repo: "binder-examples/jupyter-stacks-datascience",
-            ref: "master",
+            repo: "d-cru/test_report",
+            ref: "main",
         },
         codeMirrorConfig: {
             theme: "abcdef",
