@@ -1,0 +1,101 @@
+// Setup to load data from rawgit
+NGL.DatasourceRegistry.add(
+    "data", new NGL.StaticDatasource( "//preview.danie.lc/pdbs/" )
+);
+
+// Create NGL Stage object
+var stage = new NGL.Stage( "viewport" );
+
+// Handle window resizing
+window.addEventListener( "resize", function( event ){
+    stage.handleResize();
+}, false );
+
+
+//functions
+function addElement (el) {
+  Object.assign(el.style, {
+    position: "absolute",
+    zIndex: 10
+  })
+  stage.viewer.container.appendChild(el)
+}
+
+function createElement (name, properties, style) {
+  var el = document.createElement(name)
+  Object.assign(el, properties)
+  Object.assign(el.style, style)
+  return el
+}
+
+function createSelect (options, properties, style) {
+  var select = createElement("select", properties, style)
+  options.forEach(function (d) {
+    select.add(createElement("option", {
+      value: d[ 0 ], text: d[ 1 ]
+    }))
+  })
+  return select
+}
+
+function createFileButton (label, properties, style) {
+  var input = createElement("input", Object.assign({
+    type: "file"
+  }, properties), { display: "none" })
+  addElement(input)
+  var button = createElement("input", {
+    value: label,
+    type: "button",
+    onclick: function () { input.click() }
+  }, style)
+  return button
+}
+
+// Code for example: test/superposition
+
+
+var polymerSelect = createSelect([
+  [ "cartoon", "cartoon" ],
+  [ "spacefill", "spacefill" ],
+  [ "licorice", "licorice" ],
+  [ "surface", "surface" ]
+], {
+  onchange: function (e) {
+    //stage.getRepresentationsByName("polymer").dispose()
+    stage.eachComponent(function (o) {
+    o. //o.addRepresentation(e.target.value, {
+        //sele: "polymer",
+        //name: "polymer"
+      })
+    })
+  }
+}, { top: "36px", left: "12px" })
+addElement(polymerSelect)
+
+
+Promise.all([
+  stage.loadFile("data://clusters.pdb", {asTrajectory: true}).then(function (o) {
+      o.addRepresentation("licorice")
+      o.autoView()
+      var traj = o.addTrajectory();
+    
+      var player = new NGL.TrajectoryPlayer( traj, {
+          step: 1,
+          timeout: 10,
+          interpolateStep: 1,
+          start: 0,
+          end: traj.numframes,
+          interpolateType: "linear",
+          mode: "loop",
+          direction: "bounce"
+      } );
+
+      player.play();
+      //trajComp.trajectory.
+    //trajComp.trajectory.player.play();
+    return o
+  }),
+  
+
+  
+])
