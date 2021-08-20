@@ -25,12 +25,17 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-    
+
     # activate nglview
     - name: Activate NglView
       run: |
         jupyter-nbextension enable nglview --py --sys-prefix
-    
+
+    # Change tag of automatic snakemake code cell so it isn't visible.
+    - name: Remove Snakemake cells
+      run: |
+        find . -type f -exec sed -i  's/"snakemake-job-properties"/"snakemake-job-properties",\n     "remove-cell"/g' {} +
+
     # Build the book
     - name: Build the book
       run: |
