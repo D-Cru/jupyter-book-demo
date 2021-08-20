@@ -14,5 +14,4 @@ chapters:
 - file: notebooks
   sections:
   - file: markdown
-  - file: notebooks
 - file: there_test
