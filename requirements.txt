@@ -6,3 +6,4 @@ nglview
 bokeh
 scikit-learn
 mdtraj
+pandas
