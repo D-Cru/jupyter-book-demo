@@ -27,7 +27,7 @@ pca_dihedrals = dpca.transform(dihedrals)
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mFileNotFoundError[0m                         Traceback (most recent call last)
-[0;32m/tmp/ipykernel_1671/1445898382.py[0m in [0;36m<module>[0;34m[0m
+[0;32m/tmp/ipykernel_1712/1445898382.py[0m in [0;36m<module>[0;34m[0m
 [0;32m----> 1[0;31m [0mtraj[0m [0;34m=[0m [0mmd[0m[0;34m.[0m[0mload[0m[0;34m([0m[0mtrajectory[0m[0;34m,[0m [0mtop[0m[0;34m=[0m[0mtopology[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
 [0m[1;32m      2[0m [0;31m# Plot dihedral PCA[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
 [1;32m      3[0m [0mdihedrals[0m [0;34m=[0m [0mpickle_load[0m[0;34m([0m[0mdihedral_file[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
