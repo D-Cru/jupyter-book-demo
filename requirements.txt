@@ -4,3 +4,5 @@ numpy
 ghp-import
 nglview
 bokeh
+scikit-learn
+mdtraj
