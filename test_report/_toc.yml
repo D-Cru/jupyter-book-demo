@@ -10,6 +10,7 @@ chapters:
   sections:
   - file: 22/ed6dd3148ef9b069_GaMD_processed
   - file: 22/ed6dd3148ef9b069_GaMD_interactive
+  - file: 22/568b39635b10fbba_GaMD_processed
 - file: notebooks
   sections:
   - file: markdown
