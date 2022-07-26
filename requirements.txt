@@ -5,6 +5,5 @@ ghp-import
 nglview
 bokeh
 scikit-learn
-mdtraj
 pandas
 ipympl
