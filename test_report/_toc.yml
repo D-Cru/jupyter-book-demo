@@ -8,11 +8,7 @@ options:
 chapters:
 - file: 22/intro_22
   sections:
-  - file: 22/ed6dd3148ef9b069_GaMD_processed
   - file: 22/ed6dd3148ef9b069_GaMD_interactive
-  - file: 22/568b39635b10fbba_GaMD_processed
-  - file: 22/a61763fc40176038_GaMD_processed
-  - file: 24/e8dd07e57d6e2799_GaMD_processed
 - file: notebooks
   sections:
   - file: markdown
