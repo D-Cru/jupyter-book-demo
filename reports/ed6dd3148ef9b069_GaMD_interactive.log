@@ -1,60 +1,105 @@
 Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
     executenb(
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 1117, in execute
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
     return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 78, in wrapped
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
     return just_run(coro(*args, **kwargs))
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 57, in just_run
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
     return loop.run_until_complete(coro)
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
     return future.result()
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 558, in async_execute
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
     await self.async_execute_cell(
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in async_execute_cell
-    self._check_raise_for_error(cell, exec_reply)
-  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 765, in _check_raise_for_error
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-traj = md.load(trajectory, top=topology)
-# Plot dihedral PCA
-dihedrals = pickle_load(dihedral_file)
-dpca = pickle_load(dpca_file)
-weights = pickle_load(weight_file)
-pca_dihedrals = dpca.transform(dihedrals)
+import matplotlib
+%matplotlib widget
+import numpy as np
+import nglview as nv
+import pandas as pd
+import mdtraj as md
+import sklearn as sk
+import matplotlib.pyplot as plt
+
+def pickle_load(path):
+    """Load object from pickle file, given by path"""
+    import pickle
+    with open(path, "rb") as f:
+        object = pickle.load(f)
+    return object
+
+
+def link_ngl_wdgt_to_ax_pos(ax, pos, ngl_widget):
+    """source: https://github.com/gph82/nglview_notebooks"""
+    from matplotlib.widgets import AxesWidget
+    from scipy.spatial import cKDTree
+    r"""
+    Initial idea for this function comes from @arose, the rest is @gph82 and @clonker
+    """
+
+    kdtree = cKDTree(pos)
+    assert ngl_widget.trajectory_0.n_frames == pos.shape[0]
+    x, y = pos.T
+
+    lineh = ax.axhline(ax.get_ybound()[0], c="black", ls='--')
+    linev = ax.axvline(ax.get_xbound()[0], c="black", ls='--')
+    dot, = ax.plot(pos[0,0],pos[0,1], 'o', c='red', ms=7)
+
+    ngl_widget.isClick = False
+
+    def onclick(event):
+        linev.set_xdata((event.xdata, event.xdata))
+        lineh.set_ydata((event.ydata, event.ydata))
+        data = [event.xdata, event.ydata]
+        _, index = kdtree.query(x=data, k=1)
+        dot.set_xdata((x[index]))
+        dot.set_ydata((y[index]))
+        ngl_widget.isClick = True
+        ngl_widget.frame = index
+
+    def my_observer(change):
+        r"""Here comes the code that you want to execute
+        """
+        ngl_widget.isClick = False
+        _idx = change["new"]
+        try:
+            dot.set_xdata((x[_idx]))
+            dot.set_ydata((y[_idx]))
+        except IndexError as e:
+            dot.set_xdata((x[0]))
+            dot.set_ydata((y[0]))
+            print("caught index error with index %s (new=%s, old=%s)" % (_idx, change["new"], change["old"]))
+
+    # Connect axes to widget
+    axes_widget = AxesWidget(ax)
+    axes_widget.connect_event('button_release_event', onclick)
+
+    # Connect widget to axes
+    ngl_widget.observe(my_observer, "frame", "change")
+    
+
+folder = "test_report/assets/22/"
+topology = f"{folder}mc_gas.prmtop"
+trajectory = f"{folder}ed6dd3148ef9b069_short-traj.netcdf"
+dihedral_file = f"{folder}ed6dd3148ef9b069_dihedrals_short.dat"
+dpca_file = f"{folder}ed6dd3148ef9b069_dPCA.dat"
+weight_file = f"{folder}ed6dd3148ef9b069_dPCA_weights_MC_short.dat"
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
-[0;32m/tmp/ipykernel_1654/1445898382.py[0m in [0;36m<module>[0;34m[0m
-[0;32m----> 1[0;31m [0mtraj[0m [0;34m=[0m [0mmd[0m[0;34m.[0m[0mload[0m[0;34m([0m[0mtrajectory[0m[0;34m,[0m [0mtop[0m[0;34m=[0m[0mtopology[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      2[0m [0;31m# Plot dihedral PCA[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      3[0m [0mdihedrals[0m [0;34m=[0m [0mpickle_load[0m[0;34m([0m[0mdihedral_file[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      4[0m [0mdpca[0m [0;34m=[0m [0mpickle_load[0m[0;34m([0m[0mdpca_file[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      5[0m [0mweights[0m [0;34m=[0m [0mpickle_load[0m[0;34m([0m[0mweight_file[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Input [0;32mIn [1][0m, in [0;36m<cell line: 6>[0;34m()[0m
+[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnglview[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnv[39;00m
+[1;32m      5[0m [38;5;28;01mimport[39;00m [38;5;21;01mpandas[39;00m [38;5;28;01mas[39;00m [38;5;21;01mpd[39;00m
+[0;32m----> 6[0m [38;5;28;01mimport[39;00m [38;5;21;01mmdtraj[39;00m [38;5;28;01mas[39;00m [38;5;21;01mmd[39;00m
+[1;32m      7[0m [38;5;28;01mimport[39;00m [38;5;21;01msklearn[39;00m [38;5;28;01mas[39;00m [38;5;21;01msk[39;00m
+[1;32m      8[0m [38;5;28;01mimport[39;00m [38;5;21;01mmatplotlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01mpyplot[39;00m [38;5;28;01mas[39;00m [38;5;21;01mplt[39;00m
 
-[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/mdtraj/core/trajectory.py[0m in [0;36mload[0;34m(filename_or_filenames, discard_overlapping_frames, **kwargs)[0m
-[1;32m    375[0m         [0mtopkwargs[0m[0;34m.[0m[0mpop[0m[0;34m([0m[0;34m"atom_indices"[0m[0;34m,[0m [0;32mNone[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    376[0m         [0mtopkwargs[0m[0;34m.[0m[0mpop[0m[0;34m([0m[0;34m"frame"[0m[0;34m,[0m [0;32mNone[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0;32m--> 377[0;31m         [0mkwargs[0m[0;34m[[0m[0;34m"top"[0m[0;34m][0m [0;34m=[0m [0m_parse_topology[0m[0;34m([0m[0mkwargs[0m[0;34m[[0m[0;34m"top"[0m[0;34m][0m[0;34m,[0m [0;34m**[0m[0mtopkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m    378[0m [0;34m[0m[0m
-[1;32m    379[0m     [0;31m# grab the extension of the filename[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
-
-[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/mdtraj/core/trajectory.py[0m in [0;36m_parse_topology[0;34m(top, **kwargs)[0m
-[1;32m    171[0m         [0mtopology[0m [0;34m=[0m [0m_traj[0m[0;34m.[0m[0mtopology[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    172[0m     [0;32melif[0m [0misinstance[0m[0;34m([0m[0mtop[0m[0;34m,[0m [0mstring_types[0m[0;34m)[0m [0;32mand[0m [0;34m([0m[0mext[0m [0;32min[0m [0;34m[[0m[0;34m'.prmtop'[0m[0;34m,[0m [0;34m'.parm7'[0m[0;34m,[0m [0;34m'.prm7'[0m[0;34m][0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[0;32m--> 173[0;31m         [0mtopology[0m [0;34m=[0m [0mload_prmtop[0m[0;34m([0m[0mtop[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m    174[0m     [0;32melif[0m [0misinstance[0m[0;34m([0m[0mtop[0m[0;34m,[0m [0mstring_types[0m[0;34m)[0m [0;32mand[0m [0;34m([0m[0mext[0m [0;32min[0m [0;34m[[0m[0;34m'.psf'[0m[0;34m][0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    175[0m         [0mtopology[0m [0;34m=[0m [0mload_psf[0m[0;34m([0m[0mtop[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-
-[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/mdtraj/formats/prmtop.py[0m in [0;36mload_prmtop[0;34m(filename, **kwargs)[0m
-[1;32m    121[0m     [0mignoring[0m [0;34m=[0m [0;32mFalse[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    122[0m [0;34m[0m[0m
-[0;32m--> 123[0;31m     [0;32mwith[0m [0mopen[0m[0;34m([0m[0mfilename[0m[0;34m,[0m [0;34m'r'[0m[0;34m)[0m [0;32mas[0m [0mf[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m    124[0m         [0;32mfor[0m [0mline[0m [0;32min[0m [0mf[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[1;32m    125[0m             [0;32mif[0m [0mline[0m[0;34m[[0m[0;36m0[0m[0;34m][0m [0;34m==[0m [0;34m'%'[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-
-[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: 'test_report/assets/22/mc_gas.prmtop'
-FileNotFoundError: [Errno 2] No such file or directory: 'test_report/assets/22/mc_gas.prmtop'
+[0;31mModuleNotFoundError[0m: No module named 'mdtraj'
+ModuleNotFoundError: No module named 'mdtraj'
 
