@@ -17,89 +17,43 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import matplotlib
-%matplotlib widget
-import numpy as np
-import nglview as nv
-import pandas as pd
-import mdtraj as md
-import sklearn as sk
-import matplotlib.pyplot as plt
-
-def pickle_load(path):
-    """Load object from pickle file, given by path"""
-    import pickle
-    with open(path, "rb") as f:
-        object = pickle.load(f)
-    return object
-
-
-def link_ngl_wdgt_to_ax_pos(ax, pos, ngl_widget):
-    """source: https://github.com/gph82/nglview_notebooks"""
-    from matplotlib.widgets import AxesWidget
-    from scipy.spatial import cKDTree
-    r"""
-    Initial idea for this function comes from @arose, the rest is @gph82 and @clonker
-    """
-
-    kdtree = cKDTree(pos)
-    assert ngl_widget.trajectory_0.n_frames == pos.shape[0]
-    x, y = pos.T
-
-    lineh = ax.axhline(ax.get_ybound()[0], c="black", ls='--')
-    linev = ax.axvline(ax.get_xbound()[0], c="black", ls='--')
-    dot, = ax.plot(pos[0,0],pos[0,1], 'o', c='red', ms=7)
-
-    ngl_widget.isClick = False
-
-    def onclick(event):
-        linev.set_xdata((event.xdata, event.xdata))
-        lineh.set_ydata((event.ydata, event.ydata))
-        data = [event.xdata, event.ydata]
-        _, index = kdtree.query(x=data, k=1)
-        dot.set_xdata((x[index]))
-        dot.set_ydata((y[index]))
-        ngl_widget.isClick = True
-        ngl_widget.frame = index
-
-    def my_observer(change):
-        r"""Here comes the code that you want to execute
-        """
-        ngl_widget.isClick = False
-        _idx = change["new"]
-        try:
-            dot.set_xdata((x[_idx]))
-            dot.set_ydata((y[_idx]))
-        except IndexError as e:
-            dot.set_xdata((x[0]))
-            dot.set_ydata((y[0]))
-            print("caught index error with index %s (new=%s, old=%s)" % (_idx, change["new"], change["old"]))
-
-    # Connect axes to widget
-    axes_widget = AxesWidget(ax)
-    axes_widget.connect_event('button_release_event', onclick)
-
-    # Connect widget to axes
-    ngl_widget.observe(my_observer, "frame", "change")
-    
-
-folder = "test_report/assets/22/"
-topology = f"{folder}mc_gas.prmtop"
-trajectory = f"{folder}ed6dd3148ef9b069_short-traj.netcdf"
-dihedral_file = f"{folder}ed6dd3148ef9b069_dihedrals_short.dat"
-dpca_file = f"{folder}ed6dd3148ef9b069_dPCA.dat"
-weight_file = f"{folder}ed6dd3148ef9b069_dPCA_weights_MC_short.dat"
+traj = md.load(trajectory, top=topology)
+# Plot dihedral PCA
+dihedrals = pickle_load(dihedral_file)
+dpca = pickle_load(dpca_file)
+weights = pickle_load(weight_file)
+pca_dihedrals = dpca.transform(dihedrals)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
-Input [0;32mIn [1][0m, in [0;36m<cell line: 6>[0;34m()[0m
-[1;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnglview[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnv[39;00m
-[1;32m      5[0m [38;5;28;01mimport[39;00m [38;5;21;01mpandas[39;00m [38;5;28;01mas[39;00m [38;5;21;01mpd[39;00m
-[0;32m----> 6[0m [38;5;28;01mimport[39;00m [38;5;21;01mmdtraj[39;00m [38;5;28;01mas[39;00m [38;5;21;01mmd[39;00m
-[1;32m      7[0m [38;5;28;01mimport[39;00m [38;5;21;01msklearn[39;00m [38;5;28;01mas[39;00m [38;5;21;01msk[39;00m
-[1;32m      8[0m [38;5;28;01mimport[39;00m [38;5;21;01mmatplotlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01mpyplot[39;00m [38;5;28;01mas[39;00m [38;5;21;01mplt[39;00m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+Input [0;32mIn [2][0m, in [0;36m<cell line: 1>[0;34m()[0m
+[0;32m----> 1[0m traj [38;5;241m=[39m [43mmd[49m[38;5;241;43m.[39;49m[43mload[49m[43m([49m[43mtrajectory[49m[43m,[49m[43m [49m[43mtop[49m[38;5;241;43m=[39;49m[43mtopology[49m[43m)[49m
+[1;32m      2[0m [38;5;66;03m# Plot dihedral PCA[39;00m
+[1;32m      3[0m dihedrals [38;5;241m=[39m pickle_load(dihedral_file)
 
-[0;31mModuleNotFoundError[0m: No module named 'mdtraj'
-ModuleNotFoundError: No module named 'mdtraj'
+File [0;32m/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/mdtraj/core/trajectory.py:396[0m, in [0;36mload[0;34m(filename_or_filenames, discard_overlapping_frames, **kwargs)[0m
+[1;32m    394[0m topkwargs[38;5;241m.[39mpop([38;5;124m"[39m[38;5;124mstride[39m[38;5;124m"[39m, [38;5;28;01mNone[39;00m)
+[1;32m    395[0m topkwargs[38;5;241m.[39mpop([38;5;124m"[39m[38;5;124mstart[39m[38;5;124m"[39m, [38;5;28;01mNone[39;00m)
+[0;32m--> 396[0m kwargs[[38;5;124m"[39m[38;5;124mtop[39m[38;5;124m"[39m] [38;5;241m=[39m [43m_parse_topology[49m[43m([49m[43mkwargs[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[38;5;124;43m"[39;49m[38;5;124;43mtop[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mfilename_or_filenames[49m[43m[[49m[38;5;241;43m0[39;49m[43m][49m[43m)[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mtopkwargs[49m[43m)[49m
+[1;32m    398[0m [38;5;66;03m#get the right loader[39;00m
+[1;32m    399[0m [38;5;28;01mtry[39;00m:
+[1;32m    400[0m     [38;5;66;03m#loader = _LoaderRegistry[extension][0][39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/mdtraj/core/trajectory.py:177[0m, in [0;36m_parse_topology[0;34m(top, **kwargs)[0m
+[1;32m    175[0m     topology [38;5;241m=[39m _traj[38;5;241m.[39mtopology
+[1;32m    176[0m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(top, (string_types, os[38;5;241m.[39mPathLike)) [38;5;129;01mand[39;00m (ext [38;5;129;01min[39;00m [[38;5;124m'[39m[38;5;124m.prmtop[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124m.parm7[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124m.prm7[39m[38;5;124m'[39m]):
+[0;32m--> 177[0m     topology [38;5;241m=[39m [43mload_prmtop[49m[43m([49m[43mtop[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m    178[0m [38;5;28;01melif[39;00m [38;5;28misinstance[39m(top, (string_types, os[38;5;241m.[39mPathLike)) [38;5;129;01mand[39;00m (ext [38;5;129;01min[39;00m [[38;5;124m'[39m[38;5;124m.psf[39m[38;5;124m'[39m]):
+[1;32m    179[0m     topology [38;5;241m=[39m load_psf(top, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/mdtraj/formats/prmtop.py:123[0m, in [0;36mload_prmtop[0;34m(filename, **kwargs)[0m
+[1;32m    120[0m raw_data   [38;5;241m=[39m {}
+[1;32m    121[0m ignoring [38;5;241m=[39m [38;5;28;01mFalse[39;00m
+[0;32m--> 123[0m [38;5;28;01mwith[39;00m [38;5;28;43mopen[39;49m[43m([49m[43mfilename[49m[43m,[49m[43m [49m[38;5;124;43m'[39;49m[38;5;124;43mr[39;49m[38;5;124;43m'[39;49m[43m)[49m [38;5;28;01mas[39;00m f:
+[1;32m    124[0m     [38;5;28;01mfor[39;00m line [38;5;129;01min[39;00m f:
+[1;32m    125[0m         [38;5;28;01mif[39;00m line[[38;5;241m0[39m] [38;5;241m==[39m [38;5;124m'[39m[38;5;124m%[39m[38;5;124m'[39m:
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: 'test_report/assets/22/mc_gas.prmtop'
+FileNotFoundError: [Errno 2] No such file or directory: 'test_report/assets/22/mc_gas.prmtop'
 
