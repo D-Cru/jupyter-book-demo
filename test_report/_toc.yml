@@ -16,4 +16,6 @@ chapters:
 - file: notebooks
   sections:
   - file: markdown
+  - file: notebooks
+  - file: notebooks_md
 - file: there_test
